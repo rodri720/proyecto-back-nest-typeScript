@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { task, TaskStatus } from './task.entity';
-import { v4 as uuidv4 } from 'uuid'; // Importar y renombrar la función v4 de uuid
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TasksService {
@@ -19,22 +19,30 @@ export class TasksService {
     }
     
     createTask(title: string, description: string) {
-        const task: task = {
-            id: uuidv4(), // Usar la función renombrada
+        const newTask: task = {
+            id: uuidv4(),
             title,
             description,
-            status: TaskStatus.PENDING, // Asumiendo que TaskStatus.PENDING existe en tu enum
+            status: TaskStatus.PENDING,
         };
         
-        this.tasks.push(task);
-        return task;
+        this.tasks.push(newTask);
+        return newTask;
     }
     
-    updateTask() {
-        // Agregar lógica para actualizar una tarea
+    deleteTask(id: string) {
+        this.tasks = this.tasks.filter((task) => task.id !== id);
     }
     
-    deleteTask() {
-        // Agregar lógica para eliminar una tarea
+    getTaskById(id: string): task {
+        return this.tasks.find((task) => task.id === id);
+    }
+    
+    updateTask(id: string, updatedFields: any) {
+        
+        const taskToUpdate = this.getTaskById(id);
+        Object.assign(taskToUpdate, updatedFields);
+        this.tasks = this.tasks.map((task) => (task.id === id ? taskToUpdate : task));
+        return taskToUpdate;
     }
 }
